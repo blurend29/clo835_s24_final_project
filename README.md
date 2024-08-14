@@ -1,7 +1,7 @@
 
-# Deploy a Python Application on Kubernetes
+# Full-Stack Application Deployment and Management on Kubernetes
 
-In this project/assignment, I deployed a Python web application that displays the current time in Toronto, Canada, using Kubernetes. The application is containerized using Docker, and uses NodePort to expose it on port 3030.
+In this project, I deployed a full-stack application on a Kubernetes cluster, which includes a Node.js backend, a MongoDB database, and an Nginx frontend. I used Docker for containerization, Kubernetes for orchestration, ConfigMaps for environment management, and Persistent Volumes for data storage. This project provided me with hands-on experience in deploying, managing, and scaling a complete application on Kubernetes.
 
 ## Steps used to complete the assignment/project
 
