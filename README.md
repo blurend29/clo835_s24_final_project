@@ -5,50 +5,94 @@ In this project, I deployed a full-stack application on a Kubernetes cluster, wh
 
 ## Steps used to complete the assignment/project
 
-**Build the docker image:**
+**Step 1: Set up the Kubernetes environment**
+
+Start a Kubernetes cluster using Minikube.
 
 ```bash
-docker build -t <dockerhub username>/time-service .
+minikube start
 ```
 
-**Tag the docker image and push it to Docker Hub:**
+**Step 2: Containerize the application**
+
+*Backend*
+
+Install Required Dependencies for the backend:
 
 ```bash
-docker tag <dockerhub username>/time-service <dockerhub username>/time-service:latest
-
-docker push <dockerhub username>/time-service:latest
+cd backend
+npm init -y
+npm install express mongoose body-parser
 ```
 
-**Deploy the application by applying the Kubernetes manifests:**
+Build, tag and push the Docker image:
 
 ```bash
-kubectl apply -f deployment.yaml
-
-kubectl apply -f service.yaml
+docker build -t junjun290/node-backend .
+docker tag junjun290/node-backend junjun290/node-backend:latest
+docker push junjun290/node-backend:latest
 ```
 
-**Run minikube tunnel to create a network route on my local machine to make Kubernetes LoadBalancer services accessible (Note: this is not needed if deploying the application in the cloud):**
+*Frontend*
+
+Build, tag and push the Docker image:
 
 ```bash
-minikube tunnel
+cd frontend
+docker build -t junjun290/nginx-frontend .
+docker tag junjun290/nginx-frontend junjun290/nginx-frontend:latest
+docker push junjun290/nginx-frontend:latest
 ```
 
-**Check the status of the deployment and service:**
+**Step 3: Apply Kubernetes Manifests:**
 
 ```bash
-kubectl get deployments
-
-kubectl get pods
-
-kubectl get services
+kubectl apply -f kubernetes/mongo/mongo-pv.yaml
+kubectl apply -f kubernetes/mongo/mongo-pvc.yaml 
+kubectl apply -f kubernetes/mongo/mongo-deployment.yaml 
+kubectl apply -f kubernetes/mongo/mongo-service.yaml 
+kubectl apply -f kubernetes/backend/backend-deployment.yaml 
+kubectl apply -f kubernetes/backend/backend-service.yaml 
+kubectl apply -f kubernetes/frontend/frontend-deployment.yaml 
+kubectl apply -f kubernetes/frontend/frontend-service.yaml 
+kubectl apply -f kubernetes/configmap.yaml 
+kubectl apply -f kubernetes/secret.yaml 
 ```
 
-**Test the application:**
+**Step 4: Application Management:**
 
-**Access the application using the external IP and the port.**
+Scale out nginx-frontend and node-backend deployments:
 
 ```bash
-http://<external-ip>:3030
+kubectl scale deployment/node-backend --replicas=3
+kubectl scale deployment/nginx-frontend --replicas=3
 ```
+
+Monitor nginx-frontend and node-backend deployments:
+
+```bash
+kubectl logs -f deployment/node-backend
+kubectl logs -f deployment/nginx-frontend
+```
+
+Port forwarding:
+
+```bash
+kubectl port-forward svc/nginx-service 8081:80
+kubectl port-forward svc/node-backend-service 3000:3000
+kubectl port-forward svc/mongo-service 27017:27017
+```
+
+**Step 5: Testing and Validation:**
+
+Access the frontend via http://localhost:8081
+
+Access the backkend via http://localhost:3000
+
+Send a POST request via Postman using the URL http://localhost:3000/items
+
+Send a GET request via Postman using the URL http://localhost:3000/items to retrieve items. Also retrieve items by accessing http://localhost:3000/items using a web browser.
+
+Connect to the mongoDB database mydatabase via MongoDB Compass using the URI mongodb://localhost:27017
 
 ---
