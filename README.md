@@ -87,7 +87,7 @@ kubectl port-forward svc/mongo-service 27017:27017
 
 Access the frontend via http://localhost:8081
 
-Access the backkend via http://localhost:3000
+Access the backend via http://localhost:3000
 
 Send a POST request via Postman using the URL http://localhost:3000/items
 
